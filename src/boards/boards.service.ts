@@ -1,59 +1,72 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Board, BoardStatus } from './board.model';
+import { BoardStatus } from './board.model';
 import {v1 as uuid} from 'uuid'
 import { CreateBoardDTO } from './DTO/create-board.dto';
 import { UpdateBoardDTO } from './DTO/update-board.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { BoardRepository } from 'src/configs/board.repository';
+import { Board } from 'src/configs/board.entity';
+import { DeleteResult } from 'typeorm';
 
 @Injectable()
 export class BoardsService {
-  private boards : Board[] = [];
 
-  getAllBoards() : Board[] {
-    return this.boards
-  }
+  constructor(
+    @InjectRepository(Board)
+    private boardRepository: BoardRepository
+  ){}
 
-  createBoard(createBoardDTO: CreateBoardDTO): Board{
+
+  async createBoard(createBoardDTO: CreateBoardDTO): Promise<Board>{
     const {title,description} = createBoardDTO
 
-    const board = {
-      id:uuid(),
+    const board = this.boardRepository.create({
       title,
       description,
       status: BoardStatus.PUBLIC
-    }
+    })
 
-    this.boards.push(board)
+    await this.boardRepository.save(board);
     return board
   }
 
-  getBoardById(id: string , msg:string):Board {
-    const found = this.boards.find(board => board.id === id);
+  async getAllBoards(): Promise<Board[]>{
+    return await this.boardRepository.find()
+  }
+
+  async getBoardById(id: number , msg:string):Promise<Board> {
+    const found = await this.boardRepository.findOneBy({id});
     
     const errMsg = `Can't ${msg} board with the ${id}`
 
-    if(!found) throw new NotFoundException(errMsg)
-    
+    if (!found) throw new NotFoundException(errMsg);
+
     return found
   }
 
-  deleteBoardById(id: string): void{
-    const found = this.getBoardById(id,'delete')
-    this.boards = this.boards.filter(board => board.id !== found.id)
+  async deleteBoardById(id: number): Promise<DeleteResult>{
+    const toDelete = await this.boardRepository.delete(id);
+
+    if (toDelete.affected === 0)
+      throw new NotFoundException(`Can't Delete ${id}Board`)
+
+    return toDelete
   }
 
-  updateBoardById(id: string, updateBoard: UpdateBoardDTO, status:BoardStatus) {
+  async updateBoardById(id: number, updateBoard: UpdateBoardDTO, status:BoardStatus) {
     const { title, description } = updateBoard;
 
-    // const toChangeIndex = this.boards.findIndex(board => board.id === id)
+  //   // const toChangeIndex = this.boards.findIndex(board => board.id === id)
     
-    // this.boards[toChangeIndex].title = title;
-    // this.boards[toChangeIndex].description = description;
+  //   // this.boards[toChangeIndex].title = title;
+  //   // this.boards[toChangeIndex].description = description;
 
-    const toChange = this.getBoardById(id, 'update');
+    const toChange = await this.getBoardById(id, 'update');
     toChange.title = title
     toChange.description = description
     toChange.status = status
 
-    return this.boards
+    return this.boardRepository.save(toChange)
+    
   }
 }

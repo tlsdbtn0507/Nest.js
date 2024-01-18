@@ -9,8 +9,8 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     BoardsModule,
+    AuthModule,
     TypeOrmModule.forRoot(typeORM),
-    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

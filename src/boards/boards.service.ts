@@ -11,10 +11,7 @@ import { DeleteResult } from 'typeorm';
 @Injectable()
 export class BoardsService {
 
-  constructor(
-    @InjectRepository(Board)
-    private boardRepository: BoardRepository
-  ){}
+  constructor(@InjectRepository(Board) private boardRepository: BoardRepository){}
 
 
   async createBoard(createBoardDTO: CreateBoardDTO): Promise<Board>{

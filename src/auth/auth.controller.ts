@@ -24,4 +24,9 @@ export class AuthController {
     return this.userService.checkIdDuple(id)
   }
 
+  @Post('/login')
+  signIn(@Body() loginUserDto: CreateUserDto): Promise<string>{
+    return this.userService.login(loginUserDto)
+  }
+
 }

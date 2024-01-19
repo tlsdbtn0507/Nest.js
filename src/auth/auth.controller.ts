@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './DTO/create-user.dto';
 import { User } from './auth.entity';
@@ -25,8 +25,12 @@ export class AuthController {
   }
 
   @Post('/login')
-  signIn(@Body() loginUserDto: CreateUserDto): Promise<string>{
+  signIn(@Body() loginUserDto: CreateUserDto): Promise<{accessToken:string}>{
     return this.userService.login(loginUserDto)
   }
 
+  @Post('/test')
+  test(@Req() req) {
+    console.log('req',req)
+  }
 }

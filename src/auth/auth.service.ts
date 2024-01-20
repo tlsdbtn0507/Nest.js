@@ -14,20 +14,7 @@ export class AuthService {
   ) { }
   
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const { userName, password } = createUserDto;
-
-    const salt = await bcrypt.genSalt();
-    const hasedPw = await bcrypt.hash(password,salt)
-
-    const user = this.userRepositoy.create({ userName, password:hasedPw})
-
-    try {
-      await this.userRepositoy.save(user);
-      return user
-    } catch (error) {
-      if (error.code === '23505') throw new ConflictException('already exist id');
-      else throw new InternalServerErrorException()
-    }
+    return this.userRepositoy.createUser(createUserDto)
   };
 
   async getAllUsers() : Promise<User[]> {

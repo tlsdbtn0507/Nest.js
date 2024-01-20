@@ -7,8 +7,9 @@ import { User } from './auth.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt-strategy';
+import * as config from 'config'
 
-require('dotenv').config()
+// require('dotenv').config()
 
 @Module({
   imports: [

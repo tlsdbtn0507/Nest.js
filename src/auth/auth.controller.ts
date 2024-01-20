@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './DTO/create-user.dto';
 import { User } from './auth.entity';
 import { DeleteResult } from 'typeorm';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +31,9 @@ export class AuthController {
   }
 
   @Post('/test')
+  @UseGuards(AuthGuard())
   test(@Req() req) {
-    console.log('req',req)
+    console.log('req', req)
+    // return 1
   }
 }
